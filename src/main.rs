@@ -174,8 +174,12 @@ impl Casing {
       return Cow::Borrowed(s);
     }
     let mut res = String::with_capacity(s.len());
-    if !should_be_lower {
-      if let Some(c) = first {
+    if let Some(c) = first {
+      if should_be_lower {
+        for c in c.to_lowercase() {
+          res.push(c);
+        }
+      } else {
         for c in c.to_uppercase() {
           res.push(c);
         }
@@ -236,6 +240,7 @@ mod test {
   fn camel_case() {
     let casing = Casing::CamelCase;
     assert_eq!(Cow::Borrowed("henlo"), casing.apply_word("henlo", 0));
+    assert_eq!(Cow::Borrowed("henlo"), casing.apply_word("hEnlo", 0));
     assert_eq!(Cow::<str>::Owned("U".into()), casing.apply_word("u", 1));
     assert_eq!(Cow::Borrowed("Stinky"), casing.apply_word("Stinky", 2));
     assert_eq!(Cow::<str>::Owned("Birb".into()), casing.apply_word("biRb", 4));
