@@ -1,3 +1,4 @@
+use crate::Casing;
 use super::WordList;
 
 use rand::Rng;
@@ -14,7 +15,7 @@ impl WordList {
       .fold(0, |acc, x| 10 * acc + x)
   }
 
-  pub fn generate(&self, rng: &mut impl Rng, words: u8, separator: &str) -> String {
+  pub fn generate(&self, rng: &mut impl Rng, words: u8, separator: &str, casing: &Casing) -> String {
     info!("generating a passphrase");
 
     let mut s = String::with_capacity(64);
@@ -25,10 +26,10 @@ impl WordList {
       let r = self.roll(rng);
       info!("combined rolls: {}", r);
 
-      let w = &self.get(r);
+      let w = casing.apply_word(self.get(r), usize::from(i));
       info!("word: {}", w);
 
-      s += w;
+      s += &*w;
 
       if i < words - 1 {
         s += separator;

@@ -2,7 +2,7 @@ use crate::list::model::WordList;
 
 use clap::{App, Arg, crate_name, crate_version, crate_authors};
 
-pub fn app(lists: &'b [WordList]) -> App<'a, 'b> {
+pub fn app<'a, 'b>(lists: &'b [WordList]) -> App<'a, 'b> {
   let names: Vec<&str> = lists.iter()
     .flat_map(|x| &x.short_names)
     .map(|x| x.as_str())
@@ -41,6 +41,14 @@ pub fn app(lists: &'b [WordList]) -> App<'a, 'b> {
       .help("which character (or characters) to separate the words in the passphrases")
       .takes_value(true)
       .default_value("."))
+    .arg(Arg::with_name("casing")
+      .short("c")
+      .long("casing")
+      .alias("case")
+      .help("what casing to use for the output")
+      .takes_value(true)
+      .default_value("standard")
+      .possible_values(&["standard", "lowercase", "uppercase", "pascalcase", "camelcase"]))
     .arg(Arg::with_name("verbose")
       .long("verbose")
       .help("turn on verbose mode"))
