@@ -96,49 +96,67 @@ mod test {
 
   use std::borrow::Cow;
 
+  macro_rules! assert_owned {
+    ($lhs:expr, $rhs:expr) => {{
+      match $rhs {
+        Cow::Owned(x) => assert_eq!(x, $lhs),
+        Cow::Borrowed(_) => panic!("expected Cow::Owned but found Cow::Borrowed"),
+      }
+    }}
+  }
+
+  macro_rules! assert_borrowed {
+    ($lhs:expr, $rhs:expr) => {{
+      match $rhs {
+        Cow::Owned(_) => panic!("expected Cow::Borrowed but found Cow::Owned"),
+        Cow::Borrowed(x) => assert_eq!(x, $lhs),
+      }
+    }}
+  }
+
   #[test]
   fn standard() {
     let casing = Casing::Standard;
-    assert_eq!(Cow::Borrowed("henlo"), casing.apply_word("henlo", 0));
-    assert_eq!(Cow::Borrowed("u"), casing.apply_word("u", 1));
-    assert_eq!(Cow::Borrowed("stinky"), casing.apply_word("stinky", 2));
-    assert_eq!(Cow::Borrowed("biRb"), casing.apply_word("biRb", 4));
+    assert_borrowed!("henlo", casing.apply_word("henlo", 0));
+    assert_borrowed!("u", casing.apply_word("u", 1));
+    assert_borrowed!("stinky", casing.apply_word("stinky", 2));
+    assert_borrowed!("biRb", casing.apply_word("biRb", 4));
   }
 
   #[test]
   fn lowercase() {
     let casing = Casing::Lowercase;
-    assert_eq!(Cow::Borrowed("henlo"), casing.apply_word("henlo", 0));
-    assert_eq!(Cow::Borrowed("u"), casing.apply_word("u", 1));
-    assert_eq!(Cow::Borrowed("stinky"), casing.apply_word("stinky", 2));
-    assert_eq!(Cow::<str>::Owned("birb".into()), casing.apply_word("biRb", 4));
+    assert_borrowed!("henlo", casing.apply_word("henlo", 0));
+    assert_borrowed!("u", casing.apply_word("u", 1));
+    assert_borrowed!("stinky", casing.apply_word("stinky", 2));
+    assert_owned!("birb", casing.apply_word("biRb", 4));
   }
 
   #[test]
   fn uppercase() {
     let casing = Casing::Uppercase;
-    assert_eq!(Cow::Borrowed("HENLO"), casing.apply_word("HENLO", 0));
-    assert_eq!(Cow::<str>::Owned("U".into()), casing.apply_word("u", 1));
-    assert_eq!(Cow::<str>::Owned("STINKY".into()), casing.apply_word("stinky", 2));
-    assert_eq!(Cow::<str>::Owned("BIRB".into()), casing.apply_word("biRb", 4));
+    assert_borrowed!("HENLO", casing.apply_word("HENLO", 0));
+    assert_owned!("U", casing.apply_word("u", 1));
+    assert_owned!("STINKY", casing.apply_word("stinky", 2));
+    assert_owned!("BIRB", casing.apply_word("biRb", 4));
   }
 
   #[test]
   fn pascal_case() {
     let casing = Casing::PascalCase;
-    assert_eq!(Cow::Borrowed("Henlo"), casing.apply_word("Henlo", 0));
-    assert_eq!(Cow::<str>::Owned("U".into()), casing.apply_word("u", 1));
-    assert_eq!(Cow::Borrowed("Stinky"), casing.apply_word("Stinky", 2));
-    assert_eq!(Cow::<str>::Owned("Birb".into()), casing.apply_word("BiRb", 4));
+    assert_borrowed!("Henlo", casing.apply_word("Henlo", 0));
+    assert_owned!("U", casing.apply_word("u", 1));
+    assert_borrowed!("Stinky", casing.apply_word("Stinky", 2));
+    assert_owned!("Birb", casing.apply_word("BiRb", 4));
   }
 
   #[test]
   fn camel_case() {
     let casing = Casing::CamelCase;
-    assert_eq!(Cow::Borrowed("henlo"), casing.apply_word("henlo", 0));
-    assert_eq!(Cow::Borrowed("henlo"), casing.apply_word("hEnlo", 0));
-    assert_eq!(Cow::<str>::Owned("U".into()), casing.apply_word("u", 1));
-    assert_eq!(Cow::Borrowed("Stinky"), casing.apply_word("Stinky", 2));
-    assert_eq!(Cow::<str>::Owned("Birb".into()), casing.apply_word("biRb", 4));
+    assert_borrowed!("henlo", casing.apply_word("henlo", 0));
+    assert_owned!("henlo", casing.apply_word("hEnlo", 0));
+    assert_owned!("U", casing.apply_word("u", 1));
+    assert_borrowed!("Stinky", casing.apply_word("Stinky", 2));
+    assert_owned!("Birb", casing.apply_word("biRb", 4));
   }
 }
