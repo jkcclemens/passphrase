@@ -1,4 +1,4 @@
-use crate::Casing;
+use crate::casing::Casing;
 use super::WordList;
 
 use rand::Rng;
